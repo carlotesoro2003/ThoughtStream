@@ -42,6 +42,7 @@ export default function Header() {
   }, []);
 
   const username = userInfo?.username;
+  const userId = userInfo?.id;
   return (
     <>
       <header className="flex justify-between items-center px-6 py-4 bg-white dark:bg-gray-800 shadow-md">
@@ -57,6 +58,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+                onClick={() => navigate(`myposts/${userId}`)}
               >
                 {username}
               </Button>

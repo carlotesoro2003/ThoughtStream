@@ -137,6 +137,7 @@ app.post('/post',upload.single('image') ,async (req, res) => {
 })
 
 
+//get all posts
 app.get('/', async (req, res) => {
     const posts = await Post.find()
     .populate('author', ['username'])
@@ -147,6 +148,7 @@ app.get('/', async (req, res) => {
 })
 
 
+// Get Post by ID
 app.get('/:id', async (req, res) => {
     const { id } = req.params;
 
@@ -167,10 +169,93 @@ app.get('/:id', async (req, res) => {
     }
 });
 
+// Get Posts by User
+app.get('/users/:userId/posts', async (req, res) => {
+    const { userId } = req.params;
+  
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid ObjectId' });
+    }
+  
+    try {
+      const posts = await Post.find({ author: userId })
+        .populate('author', ['username'])
+        .sort({ createdAt: -1 });
+  
+      if (!posts.length) {
+        return res.status(404).json({ error: 'No posts found for this user' });
+      }
+  
+      res.json(posts);
+    } catch (err) {
+      console.error('Fetch Posts by User Error:', err.message);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
+// Update Post
+app.put('/edit/:id', upload.single('image'), async (req, res) => {
+    try {
+        const { id } = req.params; // Extract post ID from URL
+        const { token } = req.cookies; // Extract token from cookies
 
+        // Verify JWT Token
+        jwt.verify(token, process.env.JWT_SECRET, {}, async (err, info) => {
+            if (err) {
+                console.error("JWT Verification Error:", err.message);
+                return res.status(401).json({ error: "Unauthorized" });
+            }
 
+            const { title, summary, content } = req.body;
+            let imagePath = null;
 
+            // Handle new image upload if provided
+            if (req.file) {
+                const { originalname, path } = req.file;
+                const parts = originalname.split('.');
+                const extension = parts[parts.length - 1];
+                const newPath = `${path}.${extension}`;
+
+                // Rename file to include the extension
+                fs.renameSync(path, newPath);
+                imagePath = newPath;
+            }
+
+            // Update Post using findByIdAndUpdate
+            const updatedPost = await Post.findByIdAndUpdate(
+                id,
+                {
+                    $set: {
+                        title: title || undefined,
+                        summary: summary || undefined,
+                        content: content || undefined,
+                        ...(imagePath && { image: imagePath })
+                    }
+                },
+                { new: true, runValidators: true }
+            );
+
+            if (!updatedPost) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+
+            // Ensure the authenticated user is the author of the post
+            if (updatedPost.author.toString() !== info.id) {
+                return res.status(403).json({ error: "You are not authorized to edit this post." });
+            }
+
+            res.status(200).json({
+                message: "Post updated successfully",
+                post: updatedPost
+            });
+
+            console.log('Post Updated:', updatedPost);
+        });
+    } catch (error) {
+        console.error("Update Post Error:", error.message);
+        res.status(500).json({ error: "Failed to update post" });
+    }
+});
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
