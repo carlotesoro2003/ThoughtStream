@@ -1,1 +1,9 @@
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore environment files
 .env
+
+
+# Miscellaneous
+.DS_Store
