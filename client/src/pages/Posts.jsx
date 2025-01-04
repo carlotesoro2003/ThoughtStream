@@ -10,28 +10,28 @@ export default function Posts({ post }) {
   });
 
   return (
-    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden flex flex-col">
       <div className="relative">
         <img
           src={`http://localhost:3000/${post.image}`}
-          alt="Blog Post"
-          className="w-full h-48 transition-transform duration-300 ease-in-out transform hover:scale-105"
+          alt={post.title}
+          className="w-full h-48 object-cover"
         />
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
           <h2 className="text-xl font-semibold text-white">{post.title}</h2>
         </div>
       </div>
-      <div className="p-4">
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
+      <div className="p-4 flex-1">
+        <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
           <strong>
             {post.author.username} - {formattedDate}
           </strong>
         </p>
-        <p className="text-gray-600 dark:text-gray-400 text-sm">
+        <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3">
           {post.summary}
         </p>
       </div>
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+      <div className="p-4 flex justify-end border-t border-gray-200 dark:border-gray-700">
         <Button
           variant="link"
           className="text-blue-600 hover:text-blue-700"

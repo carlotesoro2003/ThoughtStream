@@ -257,6 +257,37 @@ app.put('/edit/:id', upload.single('image'), async (req, res) => {
     }
 });
 
+// Delete Post
+app.delete('/delete/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { token } = req.cookies;
+
+        jwt.verify(token, process.env.JWT_SECRET, {}, async (err, info) => {
+            if (err) {
+                console.error("JWT Verification Error:", err.message);
+                return res.status(401).json({ error: "Unauthorized" });
+            }
+
+            const post = await Post.findByIdAndDelete({_id: id});
+            if (!post) {
+                return res.status(404).json({ error: "Post not found" });
+            }
+
+            if (post.author.toString() !== info.id) {
+                return res.status(403).json({ error: "You are not authorized to delete this post." });
+            }
+
+            res.status(200).json({ message: "Post deleted successfully" });
+
+            console.log('Post Deleted:', post);
+        });
+    } catch (error) {
+        console.error("Delete Post Error:", error.message);
+        res.status(500).json({ error: "Failed to delete post" });
+    }
+})
+
 // MongoDB Connection
 mongoose.connect(process.env.MONGO_URI)
     .then(() => {

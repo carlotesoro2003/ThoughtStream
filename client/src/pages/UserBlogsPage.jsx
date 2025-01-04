@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FilePenLine } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 export default function UserBlogsPage() {
   const navigate = useNavigate();
@@ -10,6 +11,27 @@ export default function UserBlogsPage() {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  async function deleteBlog(id){
+    try{
+      const response = await fetch(`http://localhost:3000/delete/${id}`, {
+        method: "DELETE",
+        credentials: 'include',
+      });
+
+      if(response.ok){
+        alert('Blog deleted successfully');
+        setBlogs(blogs.filter(blog => blog._id !== id));
+      }
+      else{
+        throw new Error('Failed to delete blog');
+      }
+    }
+    catch(error){
+      console.error('Delete Error:', error.message);
+      alert('Failed to delete blog. Please try again.');
+    }
+  }
 
   useEffect(() => {
     async function fetchUserBlogs() {
@@ -103,6 +125,15 @@ export default function UserBlogsPage() {
                   >
                     <FilePenLine className="w-5 h-5 mr-2" />
                     Edit
+                  </Button>
+                  <Button
+                   variant="outline"
+                    size="sm"
+                    className="bg-red-600 text-white hover:bg-red-700 flex items-center"
+                    onClick = {() => deleteBlog(blog._id)}
+                  >
+                    <Trash2 className="w-5 h-5 mr-2" />
+                    Delete
                   </Button>
                 </div>
               </div>

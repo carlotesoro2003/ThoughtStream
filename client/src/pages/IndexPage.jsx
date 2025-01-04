@@ -7,7 +7,7 @@ export default function IndexPage() {
   const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [userInfo, setUserInfo] = useState(null);
-  useEffect(() => {
+  useEffect(() => {    
     fetch('http://localhost:3000/').then(response => {
       response.json().then(posts => {
         setPosts(posts);

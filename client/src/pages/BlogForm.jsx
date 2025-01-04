@@ -65,6 +65,7 @@ export default function BlogForm() {
         <Card className="max-w-2xl mx-auto mt-10 shadow-lg border border-gray-200">
             <CardHeader>
                 <h2 className="text-2xl font-bold text-center">Create a Blog Post</h2>
+                <p className="text-gray-500 text-center">Unleash Your Creative Prowess! Create Your Blog Here</p>
             </CardHeader>
             <CardContent>
                 <form className="space-y-4" onSubmit={createNewPost}>
@@ -127,6 +128,7 @@ export default function BlogForm() {
                     <CardFooter  className="flex justify-end space-x-2">
                         <Button
                             type="submit"
+                            className="bg-green-600 hover:bg-green-700 text-white"
                         >
                             Publish Post
                         </Button>
